@@ -9,6 +9,8 @@ build_requires:
   File::Path: '0'
   File::Spec: '0'
   Scalar::Util: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
   Test::More: '0.88'
   XSLoader: '0'
 configure_requires:
@@ -30,4 +32,4 @@ requires:
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '0.800'
+version: '0.810'
