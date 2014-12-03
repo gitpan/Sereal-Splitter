@@ -269,8 +269,13 @@ void srl_destroy_splitter(pTHX_ srl_splitter_t *splitter) {
     SvREFCNT_dec(splitter->input_sv);
     if (splitter->header_sv != NULL)
         SvREFCNT_dec(splitter->header_sv);
-    if (splitter->status_stack->data != NULL)
-        Safefree(splitter->status_stack->data);
+
+    if (splitter->status_stack) {
+        if (splitter->status_stack->data != NULL)
+            Safefree(splitter->status_stack->data);
+        Safefree(splitter->status_stack);
+    }
+
     Safefree(splitter);
 }
 
@@ -387,7 +392,7 @@ void _parse_header(pTHX_ srl_splitter_t *splitter) {
         }
 
         // allocate a new SV for uncompressed data
-        sv_2mortal(splitter->input_sv);
+        SvREFCNT_dec(splitter->input_sv);
         splitter->input_sv = newSVpvs("");
         new_input_str = SvGROW(splitter->input_sv, uncompressed_len);
 
@@ -421,7 +426,7 @@ void _parse_header(pTHX_ srl_splitter_t *splitter) {
         mz_ulong tmp = uncompressed_len;
 
         // allocate a new SV for uncompressed data
-        sv_2mortal(splitter->input_sv);
+        SvREFCNT_dec(splitter->input_sv);
         splitter->input_sv = newSVpvs("");
         new_input_str = SvGROW(splitter->input_sv, uncompressed_len);
 
@@ -1024,8 +1029,10 @@ SV* srl_splitter_next_chunk(pTHX_ srl_splitter_t * splitter) {
 
         sv_2mortal(splitter->chunk);
         return compressed_chunk;
+    } else {
+        sv_2mortal(splitter->chunk);
+        return &PL_sv_undef;
     }
-    return &PL_sv_undef;
 }
 
 
